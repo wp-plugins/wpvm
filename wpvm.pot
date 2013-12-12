@@ -1,0 +1,110 @@
+#  POT (Portable Object Template)
+#
+#  This file is part of the WordPress Varnish Modified plugin for WordPress.
+#
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: wpvm 1.0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-12-11 22:55+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: wpvm.php:383
+msgid "Varnish"
+msgstr ""
+
+#: wpvm.php:433
+msgid "WordPress Varnish Modified Configuration"
+msgstr ""
+
+#: wpvm.php:544
+msgid "Settings Saved!"
+msgstr ""
+
+#: wpvm.php:547
+msgid "You do not have the privileges."
+msgstr ""
+
+#: wpvm.php:559
+msgid "WordPress-Varnish-Modified Administration Interface"
+msgstr ""
+
+#: wpvm.php:560
+msgid "IP address and port configuration"
+msgstr ""
+
+#: wpvm.php:567
+msgid "These values can't be edited since there's a global configuration located in <em>wp-config.php</em>. If you want to change these settings, please update the file or contact the administrator."
+msgstr ""
+
+#: wpvm.php:570
+msgid "Current configuration:"
+msgstr ""
+
+#: wpvm.php:573
+msgid "Version: "
+msgstr ""
+
+#: wpvm.php:577
+msgid "Server: "
+msgstr ""
+
+#: wpvm.php:577
+msgid "Port: "
+msgstr ""
+
+#: wpvm.php:587
+msgid "Varnish Administration IP Address"
+msgstr ""
+
+#: wpvm.php:588
+msgid "Varnish Administration Port"
+msgstr ""
+
+#: wpvm.php:589
+msgid "Varnish Secret"
+msgstr ""
+
+#: wpvm.php:608
+msgid "Add one more server"
+msgstr ""
+
+#: wpvm.php:614
+msgid "Timeout"
+msgstr ""
+
+#: wpvm.php:614
+msgid "seconds"
+msgstr ""
+
+#: wpvm.php:616
+msgid "Use admin port instead of PURGE method."
+msgstr ""
+
+#: wpvm.php:618
+msgid "Also purge all page navigation."
+msgstr ""
+
+#: wpvm.php:620
+msgid "Also purge all comment navigation."
+msgstr ""
+
+#: wpvm.php:622
+msgid "Varnish Version"
+msgstr ""
+
+#: wpvm.php:624
+msgid "Save Changes"
+msgstr ""
+
+#: wpvm.php:754
+msgid "Settings"
+msgstr ""
