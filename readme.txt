@@ -3,7 +3,7 @@ Contributors: gnotaras, pkhamre, wfelipe, eitch
 Tags: cache, caching, performance, varnish, purge, speed, invalidate, ban
 Requires at least: 3.1.0
 Tested up to: 3.8
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -26,7 +26,11 @@ a tested patch which adds a needed feature.
 
 Development takes place at:
 
-    https://github.com/gnotaras/wordpress-varnish-modified
+    https://bitbucket.org/gnotaras/wordpress-wpvm
+
+Mirror:
+
+    https://github.com/gnotaras/wordpress-wpvm
 
 Pull requests are welcome, but it may take a while before they are merged.
 

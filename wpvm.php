@@ -3,7 +3,7 @@
 Plugin Name: WPVM
 Plugin URI: https://github.com/gnotaras/wordpress-varnish-modified
 Description: WPVM (WordPress Varnish Modified) purges pages from Varnish caching servers either automatically as content is updated or on demand.
-Version: 1.0.2
+Version: 1.0.3
 Author: George Notaras
 Author URI: http://www.g-loaded.eu/
 License: GPLv2+
