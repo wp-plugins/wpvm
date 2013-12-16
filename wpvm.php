@@ -2,8 +2,8 @@
 /*
 Plugin Name: WPVM
 Plugin URI: https://github.com/gnotaras/wordpress-varnish-modified
-Description: Invalidate the varnish cache automatically when content is updated or on-demand.
-Version: 1.0.1
+Description: WPVM (WordPress Varnish Modified) purges pages from Varnish caching servers either automatically as content is updated or on demand.
+Version: 1.0.2
 Author: George Notaras
 Author URI: http://www.g-loaded.eu/
 License: GPLv2+
@@ -41,7 +41,7 @@ class WPVM {
     public $wpv_update_commentnavi_optname;
 
     // Store all URLs to be purged in this array. This is used in order to avoid
-    // duplicate purges/bans.
+    // duplicate purges/bans. Contains *absolute* URLs.
     public $purge_url_pool = array();
 
     function WPVM() {
@@ -55,6 +55,7 @@ class WPVM {
         $this->wpv_update_commentnavi_optname = "wpvm_update_commentnavi";
         $this->wpv_use_adminport_optname = "wpvm_use_adminport";
         $this->wpv_vversion_optname = "wpvm_vversion";
+        $this->wpv_url_group_optname = "wpvm_url_group";
         $wpv_addr_optval = array ("127.0.0.1");
         $wpv_port_optval = array (80);
         $wpv_secret_optval = array ("");
@@ -63,6 +64,7 @@ class WPVM {
         $wpv_update_commentnavi_optval = 0;
         $wpv_use_adminport_optval = 0;
         $wpv_vversion_optval = 2;
+        $wpv_url_group_optval = '';
 
         if ( (get_option($this->wpv_addr_optname) == FALSE) ) {
             add_option($this->wpv_addr_optname, $wpv_addr_optval, '', 'yes');
@@ -94,6 +96,10 @@ class WPVM {
 
         if ( (get_option($this->wpv_vversion_optname) == FALSE) ) {
             add_option($this->wpv_vversion_optname, $wpv_vversion_optval, '', 'yes');
+        }
+
+        if ( (get_option($this->wpv_url_group_optname) == FALSE) ) {
+            add_option($this->wpv_url_group_optname, $wpv_url_group_optval, '', 'yes');
         }
 
         // Localization init
@@ -164,8 +170,16 @@ class WPVM {
 
     // WPVMPurgeURL - Using a URL, clear the cache
     function WPVMPurgeURL($wpv_purl) {
-        $wpv_purl = preg_replace( '#^https?://[^/]+#i', '', $wpv_purl );
         $this->WPVMPurgeObject($wpv_purl);
+    }
+
+    // WPVMPurgeURLGroup
+    function WPVMPurgeURLGroup() {
+        $wpv_url_group_optval = get_option($this->wpv_url_group_optname);
+        $urls = preg_split('#\r?\n#', $wpv_url_group_optval, -1, PREG_SPLIT_NO_EMPTY);
+        foreach ( $urls as $url ) {
+            $this->WPVMPurgeObject( $url );
+        }
     }
 
     //wrapper on WPVMPurgeCommonObjects for transition_post_status
@@ -206,7 +220,7 @@ class WPVM {
 
         // Static Posts page (Added only if a static page used as the 'posts page')
         if ( get_option('show_on_front', 'posts') == 'page' && intval(get_option('page_for_posts', 0)) > 0 ) {
-            $posts_page_url = preg_replace( '#^https?://[^/]+#i', '', get_permalink(intval(get_option('page_for_posts'))) );
+            $posts_page_url = get_permalink(intval(get_option('page_for_posts')));
             $this->WPVMPurgeObject( $posts_page_url . $archive_pattern );
         }
 
@@ -220,8 +234,11 @@ class WPVM {
 
         // Category Archive
         $category_slugs = array();
-        foreach( get_the_category($post->ID) as $cat ) {
-            $category_slugs[] = $cat->slug;
+        $categories = get_the_category($post->ID);
+        if ( ! empty($categories) ) {
+            foreach( $categories as $cat ) {
+                $category_slugs[] = $cat->slug;
+            }
         }
         if ( ! empty($category_slugs) ) {
             if ( count($category_slugs) > 1 ) {
@@ -238,8 +255,11 @@ class WPVM {
 
         // Tag Archive
         $tag_slugs = array();
-        foreach( get_the_tags($post->ID) as $tag ) {
-            $tag_slugs[] = $tag->slug;
+        $tags = get_the_tags($post->ID);
+        if ( ! empty($tags) ) {
+            foreach( $tags as $tag ) {
+                $tag_slugs[] = $tag->slug;
+            }
         }
         if ( ! empty($tag_slugs) ) {
             if ( count($tag_slugs) > 1 ) {
@@ -255,22 +275,24 @@ class WPVM {
         }
 
         // Author Archive
-        $author_archive_url = preg_replace('#^https?://[^/]+#i', '', get_author_posts_url($post->post_author) );
-        $this->WPVMPurgeObject( $author_archive_url . $archive_pattern );
+        $this->WPVMPurgeObject( get_author_posts_url($post->post_author) . $archive_pattern );
 
         // Date based archives
         $archive_year = mysql2date('Y', $post->post_date);
         $archive_month = mysql2date('m', $post->post_date);
         $archive_day = mysql2date('d', $post->post_date);
         // Yearly Archive
-        $archive_year_url = preg_replace('#^https?://[^/]+#i', '', get_year_link( $archive_year ) );
-        $this->WPVMPurgeObject( $archive_year_url . $archive_pattern );
+        $this->WPVMPurgeObject( get_year_link( $archive_year ) . $archive_pattern );
         // Monthly Archive
-        $archive_month_url = preg_replace('#^https?://[^/]+#i', '', get_month_link( $archive_year, $archive_month ) );
-        $this->WPVMPurgeObject( $archive_month_url . $archive_pattern );
+        $this->WPVMPurgeObject( get_month_link( $archive_year, $archive_month ) . $archive_pattern );
         // Daily Archive
-        $archive_day_url = preg_replace('#^https?://[^/]+#i', '', get_day_link( $archive_year, $archive_month, $archive_day ) );
-        $this->WPVMPurgeObject( $archive_day_url . $archive_pattern );
+        $this->WPVMPurgeObject( get_day_link( $archive_year, $archive_month, $archive_day ) . $archive_pattern );
+
+        // Sitemap
+        $this->WPVMPurgeObject( '/(sitemap(_index)?\.xml(\.gz)?|[a-z0-9_\-]+-sitemap([0-9]+)?\.xml(\.gz)?)$' );
+        // Also consider these shorter patterns, which btw do not cover all cases:
+        // ([a-z0-9_\-]*?)sitemap([a-z0-9_\-]*)?\.xml(\.gz)?
+        // sitemap\.xml\.gz
     }
 
     //wrapper on WPVMPurgePost for transition_post_status
@@ -310,8 +332,6 @@ class WPVM {
             $wpv_url = get_permalink($post->ID);
         }
 
-        $wpv_url = preg_replace( '#^https?://[^/]+#i', '', $wpv_url );
-
         // Purge post comments feed and comment pages, if requested, before
         // adding multipage support.
         if ( $purge_comments === true ) {
@@ -332,15 +352,32 @@ class WPVM {
         // Purge object permalink
         $this->WPVMPurgeObject($wpv_url);
 
-        // For attachments, also purge the parent post, if it is published.
+        // For attachments, also purge the parent post, if it is published,
+        // and also the links to the actual media files.
         if ( get_post_type($post) == 'attachment' ) {
+            // Purge permalink of parent post (where applicable)
             if ( $post->post_parent > 0 ) {
                 $parent_post = get_post( $post->post_parent );
                 if ( $parent_post->post_status == 'publish' ) {
                     // If the parent post is published, then purge its permalink
-                    $wpv_url = preg_replace( '#^https?://[^/]+#i', '', get_permalink($parent_post->ID) );
-                    $this->WPVMPurgeObject( $wpv_url );
+                    $this->WPVMPurgeObject( get_permalink($parent_post->ID) . '([\d]+/)?$' );
                 }
+            }
+
+            // Purge links to media files
+            $mime_type = get_post_mime_type( $post->ID );
+            $attachment_type = preg_replace( '#/[^/]*$#', '', $mime_type );
+
+            if ( 'image' == $attachment_type ) {
+                $available_sizes = get_intermediate_image_sizes();
+                foreach ( $available_sizes as $size ) {
+                    $size_meta = wp_get_attachment_image_src( $post->ID, $size );
+                    $this->WPVMPurgeObject( $size_meta[0] );
+                }
+            } elseif ( 'video' == $attachment_type ) {
+                $this->WPVMPurgeObject( wp_get_attachment_url($post->ID) );
+            } elseif ( 'audio' == $attachment_type ) {
+                $this->WPVMPurgeObject( wp_get_attachment_url($post->ID) );
             }
         }
     }
@@ -374,6 +411,11 @@ class WPVM {
 
         // Only administrators may purge the cache on demand.
         if ( ! current_user_can('manage_options') ) {
+            return;
+        }
+
+        // Do not display the menu when the user is in the WP administration panel.
+        if ( is_admin() ) {
             return;
         }
 
@@ -415,6 +457,14 @@ class WPVM {
             'href'  => admin_url( wp_nonce_url('admin.php?page=WPVM&wpvm_clear_blog_cache&protocol=' . $protocol . '&next=' . $next, 'wpvm') )
         ));
 
+        // Submenu - Purge URL Group
+        $admin_bar->add_menu( array(
+            'id'    => 'clear-url-group',
+            'parent' => 'wpvm',
+            'title' => 'Purge URL Group',
+            'href'  => admin_url( wp_nonce_url('admin.php?page=WPVM&wpvm_clear_url_group&protocol=' . $protocol . '&next=' . $next, 'wpvm') )
+        ));
+
         // Submenu - Purge the current page
         // This works in two ways:
         // 1) If a post_id is available, then ``WPVMPurgePost()`` is used.
@@ -447,6 +497,19 @@ class WPVM {
                 $next = '';
                 if ( isset($_GET['next']) ) {
                     $next = urldecode($_GET['next']);
+                    // Remove any previously set wpvm parameter.
+                    if ( strpos($next, '?') !== false ) {
+                        list( $base_url, $parameters ) = explode( '?', $next );
+                        parse_str( $parameters, $output );
+                        if ( isset($output['wpvm']) ) {
+                            unset( $output['wpvm'] ); // remove the 'wpvm' parameter
+                        }
+                        if ( ! empty($output) ) {
+                            $next = $base_url . '?' . http_build_query($output ); // Rebuild the url
+                        } else {
+                            $next = $base_url;
+                        }
+                    }
                 }
                 $post_id = 0;
                 if ( isset($_GET['post_id']) ) {
@@ -465,8 +528,14 @@ class WPVM {
                     $this->WPVMPurgeAll();
                     // Determine redirect URL
                     $location = site_url( $next . '?wpvm=purged_all_cache' );
-                    // Set the protocol of the original page
-                    $location = preg_replace('#^https?://#i', $protocol . '://', $location );
+                    
+                }
+
+                // Purge URL Group
+                if (isset($_GET['wpvm_clear_url_group']) && wp_verify_nonce( $nonce, 'wpvm' )) {
+                    $this->WPVMPurgeURLGroup();
+                    // Determine redirect URL
+                    $location = site_url( $next . '?wpvm=purged_url_group' );
                 }
 
                 // Purge Current Page or Post Object
@@ -475,17 +544,15 @@ class WPVM {
                         $this->WPVMPurgePost($post_id);
                         // Determine redirect URL
                         $location = site_url( $next . '?wpvm=purged_object_' . $post_id );
-                        // Set the protocol of the original page
-                        $location = preg_replace('#^https?://#i', $protocol . '://', $location );
                     } else {
-                        $this->WPVMPurgeURL($next);
+                        $this->WPVMPurgeURL( $next . '$' );
                         // Determine redirect URL
                         $location = site_url( $next . '?wpvm=purged_current_page' );
-                        // Set the protocol of the original page
-                        $location = preg_replace('#^https?://#i', $protocol . '://', $location );
                     }
                 }
 
+                // Set the protocol of the original page
+                $location = preg_replace('#^https?://#i', $protocol . '://', $location );
                 // Use this workaround to redirect.
                 if ( ! empty( $location ) ) {
                     echo '<script type="text/javascript"> window.location="' . $location . '"; </script>';
@@ -539,9 +606,38 @@ class WPVM {
                         $wpv_vversion_optval = $_POST["$this->wpv_vversion_optname"];
                         update_option($this->wpv_vversion_optname, $wpv_vversion_optval);
                     }
+
+                    if (!empty($_POST["$this->wpv_url_group_optname"])) {
+                        $wpv_url_group_optval = esc_textarea( wp_kses( stripslashes( $_POST["$this->wpv_url_group_optname"] ), array() ) );
+                        update_option($this->wpv_url_group_optname, $wpv_url_group_optval);
+                    }
                 }
 
-                ?><div class="updated"><p><?php echo __('Settings Saved!','wpvm' ); ?></p></div><?php
+                // Purge single url initiated from the admin interface box
+                if (isset($_POST['wpvm_purge_url_submit'])) {
+                    $this->WPVMPurgeURL($_POST['wpvm_purge_url']);
+                    ?><div class="updated"><p><?php echo __('Successfully purged URL!','wpvm' ); ?></p></div><?php
+
+                // Purge url group
+                } elseif (isset($_POST['wpvm_purge_url_group'])) {
+                    $this->WPVMPurgeURLGroup();
+                    ?><div class="updated"><p><?php echo __('Successfully purged URL group!','wpvm' ); ?></p></div><?php
+
+                // Purge robots.txt
+                } elseif (isset($_POST['wpvm_purge_robots_txt'])) {
+                    $this->WPVMPurgeURL( site_url('/robots.txt') );
+                    ?><div class="updated"><p><?php echo __('Successfully purged robots.txt!','wpvm' ); ?></p></div><?php
+
+                // Purge all cache
+                } elseif (isset($_POST['wpvm_purge_all_cache'])) {
+                    $this->WPVMPurgeAll();
+                    ?><div class="updated"><p><?php echo __('Successfully purged all cache!','wpvm' ); ?></p></div><?php
+
+                } else {
+
+                    ?><div class="updated"><p><?php echo __('Settings Saved!','wpvm' ); ?></p></div><?php
+
+                }
 
             } else {
                 ?><div class="updated"><p><?php echo __('You do not have the privileges.','wpvm' ); ?></p></div><?php
@@ -553,11 +649,13 @@ class WPVM {
         $wpv_update_commentnavi_optval = get_option($this->wpv_update_commentnavi_optname);
         $wpv_use_adminport_optval = get_option($this->wpv_use_adminport_optname);
         $wpv_vversion_optval = get_option($this->wpv_vversion_optname);
+        $wpv_url_group_optval = get_option($this->wpv_url_group_optname);
+
         ?>
         <div class="wrap">
         <script type="text/javascript" src="<?php echo plugins_url('js/wpvm.js', __FILE__ ); ?>"></script>
         <h2><?php echo __("WordPress-Varnish-Modified Administration Interface",'wpvm'); ?></h2>
-        <h3><?php echo __("IP address and port configuration",'wpvm'); ?></h3>
+        <h3 class="title"><?php echo __("Varnish Server Settings",'wpvm'); ?></h3>
         <form method="POST" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
         <?php
         // Can't be edited - already defined in wp-config.php
@@ -593,10 +691,10 @@ class WPVM {
             $addrs = get_option($this->wpv_addr_optname);
             $ports = get_option($this->wpv_port_optname);
             $secrets = get_option($this->wpv_secret_optname);
-            //echo "rowCount = $i\n";
+            //echo "rowCountVarnishServer = $i\n";
             for ($i = 0; $i < count ($addrs); $i++) {
                 // let's center the row creation in one spot, in javascript
-                echo "addRow('form-table', $i, '$addrs[$i]', $ports[$i], '$secrets[$i]');\n";
+                echo "addRowVarnishServer('form-table', $i, '$addrs[$i]', $ports[$i], '$secrets[$i]');\n";
             } ?>
             </script>
             </table>
@@ -605,7 +703,7 @@ class WPVM {
 
             <table>
             <tr>
-            <td colspan="3"><input type="button" class="" name="wpvm_admin" value="+" onclick="addRow ('form-table', rowCount)" /> <?php echo __("Add one more server",'wpvm'); ?></td>
+            <td colspan="3"><input type="button" class="" name="wpvm_admin" value="+" onclick="addRowVarnishServer ('form-table', rowCountVarnishServer)" /> <?php echo __("Add one more server",'wpvm'); ?></td>
             </tr>
             </table>
             <?php
@@ -621,7 +719,34 @@ class WPVM {
 
         <p><?php echo __('Varnish Version', 'wpvm'); ?>: <select name="wpvm_vversion"><option value="2" <?php if ($wpv_vversion_optval == 2) echo 'selected '?>/> 2 </option><option value="3" <?php if ($wpv_vversion_optval == 3) echo 'selected '?>/> 3 </option></select></p>
 
+        <?php printf(
+        '<h3 class="title">URL Group</h3>
+
+        <p><label for="wpvm_url_group">'.__('This box may contain a list of URLs (regex), which can be purged as a group either from the Varnish menu in the admin bar or from the tools below.', 'wpvm').'
+        </label></p>
+        </p>
+        <p><textarea name="wpvm_url_group" id="wpvm_url_group" class="large-text code" cols="50" rows="8">' . esc_attr( stripslashes( $wpv_url_group_optval ) ) . '</textarea></p>
+        '); ?>
+
+
         <p class="submit"><input type="submit" class="button-primary" name="wpvm_admin" value="<?php echo __("Save Changes",'wpvm'); ?>" /></p>
+
+        <h3 class="title">Tools</h3>
+        
+        <h4 class="title">Purge single URL</h4>
+        <p>
+            <input class="regular-text" type="text" name="wpvm_purge_url" value="<?php echo site_url() . '/'; ?>" />
+            <input type="submit" class="button-primary" name="wpvm_purge_url_submit" value="<?php echo __("Purge",'wpvm'); ?>" />
+        </p>
+
+        <h4 class="title">Purge URL Group</h4>
+        <p><input type="submit" class="button-primary" name="wpvm_purge_url_group" value="<?php echo __("Purge",'wpvm'); ?>" /></p>
+
+        <h4 class="title">Purge robots.txt</h4>
+        <p><input type="submit" class="button-primary" name="wpvm_purge_robots_txt" value="<?php echo __("Purge",'wpvm'); ?>" /></p>
+
+        <h4 class="title">Purge All Cache</h4>
+        <p><input type="submit" class="button-primary" name="wpvm_purge_all_cache" value="<?php echo __("Purge",'wpvm'); ?>" /></p>
 
         </form>
         </div>
@@ -629,8 +754,27 @@ class WPVM {
     }
 
     // WPVMPurgeObject - Adds the URL to the URL pool.
-    function WPVMPurgeObject($wpv_url) {
-        array_push($this->purge_url_pool, $wpv_url);
+    // accepts relative and absolute URLs. If $wpv_url is a relative URL,
+    // then it is converted to an absolute URL.
+    function WPVMPurgeObject( $wpv_url ) {
+
+        // Check if this is a relative URL
+        $pattern = '#^https?://.*#i';
+        preg_match( $pattern, $wpv_url, $matches );
+        if ($matches) {
+            // Add the URL as is.
+            array_push( $this->purge_url_pool, $wpv_url );
+        } else {
+            // Convert it to absolute
+            $wpv_url_abs = site_url( $wpv_url );
+            // On Network installations (Multisite), we first try to use the
+            // ``domain_mapping_siteurl()`` function, if available.
+            //if ( is_multisite() && function_exists('domain_mapping_siteurl') ) {
+            //    // check for domain mapping plugin by donncha
+            //    $site_url = domain_mapping_siteurl('NA');
+            //}
+            array_push( $this->purge_url_pool, $wpv_url_abs );
+        }
     }
 
     // Purges all URLs in the pool.
@@ -670,18 +814,11 @@ class WPVM {
         }
 
         // Process URL pool and purge
-        foreach ($url_pool as $wpv_url) {
+        foreach ($url_pool as $wpv_url_abs) {
 
-            // check for domain mapping plugin by donncha
-            if (function_exists('domain_mapping_siteurl')) {
-                $wpv_wpurl = domain_mapping_siteurl('NA');
-            } else {
-                $wpv_wpurl = get_bloginfo('url');
-            }
-            $wpv_replace_wpurl = '/^https?:\/\/([^\/]+)(.*)/i';
-            $wpv_host = preg_replace($wpv_replace_wpurl, "$1", $wpv_wpurl);
-            $wpv_blogaddr = preg_replace($wpv_replace_wpurl, "$2", $wpv_wpurl);
-            $wpv_url = $wpv_blogaddr . $wpv_url;
+            $wpv_url_pattern = '#^https?://([^/]+)(.*)#i';
+            $wpv_host = preg_replace($wpv_url_pattern, "$1", $wpv_url_abs);
+            $wpv_url = preg_replace($wpv_url_pattern, "$2", $wpv_url_abs);
 
             for ($i = 0; $i < count ($wpv_purgeaddr); $i++) {
                 $varnish_sock = fsockopen($wpv_purgeaddr[$i], $wpv_purgeport[$i], $errno, $errstr, $wpv_timeout);

@@ -16,5 +16,6 @@ delete_option('wpvm_update_pagenavi');
 delete_option('wpvm_update_commentnavi');
 delete_option('wpvm_use_adminport');
 delete_option('wpvm_vversion');
+delete_option('wpvm_url_group');
 
 ?>

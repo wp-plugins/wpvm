@@ -1,8 +1,8 @@
 // our id for our rows, we can have rows added and removed
 // so we need a base
-var rowCount = 0;
+var rowCountVarnishServer = 0;
 
-function createRow(tableID, id, addr, port, secret) {
+function createVarnishServerRow(tableID, id, addr, port, secret) {
 	var row = document.createElement ('tr');
 	var td1 = document.createElement ('td');
 	var td2 = document.createElement ('td');
@@ -50,11 +50,11 @@ function createRow(tableID, id, addr, port, secret) {
 	return row;
 }
 
-function addRow(tableID, id, addr, port, secret) {
+function addRowVarnishServer(tableID, id, addr, port, secret) {
 	var tbody = document.getElementById(tableID).getElementsByTagName ('tbody')[0];
 
-	rowCount++;
-	var row = createRow(tableID, id, addr, port, secret);
+	rowCountVarnishServer++;
+	var row = createVarnishServerRow(tableID, id, addr, port, secret);
 
 	tbody.appendChild (row);
 }

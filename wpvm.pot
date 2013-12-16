@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: wpvm 1.0.1\n"
+"Project-Id-Version: wpvm 1.0.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-12-11 22:55+0200\n"
+"POT-Creation-Date: 2013-12-16 06:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,94 +17,118 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: wpvm.php:383
+#: wpvm.php:425
 msgid "Varnish"
 msgstr ""
 
-#: wpvm.php:433
+#: wpvm.php:483
 msgid "WordPress Varnish Modified Configuration"
 msgstr ""
 
-#: wpvm.php:544
-msgid "Settings Saved!"
-msgstr ""
-
-#: wpvm.php:547
-msgid "You do not have the privileges."
-msgstr ""
-
-#: wpvm.php:559
-msgid "WordPress-Varnish-Modified Administration Interface"
-msgstr ""
-
-#: wpvm.php:560
-msgid "IP address and port configuration"
-msgstr ""
-
-#: wpvm.php:567
-msgid "These values can't be edited since there's a global configuration located in <em>wp-config.php</em>. If you want to change these settings, please update the file or contact the administrator."
-msgstr ""
-
-#: wpvm.php:570
-msgid "Current configuration:"
-msgstr ""
-
-#: wpvm.php:573
-msgid "Version: "
-msgstr ""
-
-#: wpvm.php:577
-msgid "Server: "
-msgstr ""
-
-#: wpvm.php:577
-msgid "Port: "
-msgstr ""
-
-#: wpvm.php:587
-msgid "Varnish Administration IP Address"
-msgstr ""
-
-#: wpvm.php:588
-msgid "Varnish Administration Port"
-msgstr ""
-
-#: wpvm.php:589
-msgid "Varnish Secret"
-msgstr ""
-
-#: wpvm.php:608
-msgid "Add one more server"
-msgstr ""
-
-#: wpvm.php:614
-msgid "Timeout"
-msgstr ""
-
-#: wpvm.php:614
-msgid "seconds"
-msgstr ""
-
-#: wpvm.php:616
-msgid "Use admin port instead of PURGE method."
-msgstr ""
-
-#: wpvm.php:618
-msgid "Also purge all page navigation."
-msgstr ""
-
-#: wpvm.php:620
-msgid "Also purge all comment navigation."
-msgstr ""
-
-#: wpvm.php:622
-msgid "Varnish Version"
+#: wpvm.php:619
+msgid "Successfully purged URL!"
 msgstr ""
 
 #: wpvm.php:624
+msgid "Successfully purged URL group!"
+msgstr ""
+
+#: wpvm.php:629
+msgid "Successfully purged robots.txt!"
+msgstr ""
+
+#: wpvm.php:634
+msgid "Successfully purged all cache!"
+msgstr ""
+
+#: wpvm.php:638
+msgid "Settings Saved!"
+msgstr ""
+
+#: wpvm.php:643
+msgid "You do not have the privileges."
+msgstr ""
+
+#: wpvm.php:657
+msgid "WordPress-Varnish-Modified Administration Interface"
+msgstr ""
+
+#: wpvm.php:658
+msgid "Varnish Server Settings"
+msgstr ""
+
+#: wpvm.php:665
+msgid "These values can't be edited since there's a global configuration located in <em>wp-config.php</em>. If you want to change these settings, please update the file or contact the administrator."
+msgstr ""
+
+#: wpvm.php:668
+msgid "Current configuration:"
+msgstr ""
+
+#: wpvm.php:671
+msgid "Version: "
+msgstr ""
+
+#: wpvm.php:675
+msgid "Server: "
+msgstr ""
+
+#: wpvm.php:675
+msgid "Port: "
+msgstr ""
+
+#: wpvm.php:685
+msgid "Varnish Administration IP Address"
+msgstr ""
+
+#: wpvm.php:686
+msgid "Varnish Administration Port"
+msgstr ""
+
+#: wpvm.php:687
+msgid "Varnish Secret"
+msgstr ""
+
+#: wpvm.php:706
+msgid "Add one more server"
+msgstr ""
+
+#: wpvm.php:712
+msgid "Timeout"
+msgstr ""
+
+#: wpvm.php:712
+msgid "seconds"
+msgstr ""
+
+#: wpvm.php:714
+msgid "Use admin port instead of PURGE method."
+msgstr ""
+
+#: wpvm.php:716
+msgid "Also purge all page navigation."
+msgstr ""
+
+#: wpvm.php:718
+msgid "Also purge all comment navigation."
+msgstr ""
+
+#: wpvm.php:720
+msgid "Varnish Version"
+msgstr ""
+
+#: wpvm.php:725
+msgid "This box may contain a list of URLs (regex), which can be purged as a group either from the Varnish menu in the admin bar or from the tools below."
+msgstr ""
+
+#: wpvm.php:732
 msgid "Save Changes"
 msgstr ""
 
-#: wpvm.php:754
+#: wpvm.php:739 wpvm.php:743 wpvm.php:746 wpvm.php:749
+msgid "Purge"
+msgstr ""
+
+#: wpvm.php:891
 msgid "Settings"
 msgstr ""
