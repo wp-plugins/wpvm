@@ -3,7 +3,7 @@
 Plugin Name: WPVM
 Plugin URI: https://github.com/gnotaras/wordpress-varnish-modified
 Description: WPVM (WordPress Varnish Modified) purges pages from Varnish caching servers either automatically as content is updated or on demand.
-Version: 1.0.3
+Version: 1.0.4
 Author: George Notaras
 Author URI: http://www.g-loaded.eu/
 License: GPLv2+
@@ -203,29 +203,36 @@ class WPVM {
             return;
         }
         
-        // NOTE: Policy for archive purging
-        // By default, only the first page of the archives is purged. If
-        // 'wpv_update_pagenavi_optname' is checked, then all the pages of each
-        // archive are purged.
+        // Policy for archive purging
+        // --------------------------
+        // By default, only the first page and the feeds of the archives are
+        // purged. If ``wpv_update_pagenavi_optname`` is checked, then all the
+        // pages of each archive are purged as well.
+
+        // Pattern for archive feeds
+        $archive_feed_pattern = '(?:feed/(?:(atom|rdf)/)?)?$';
+        // Pattern for archive page
+        $archive_page_pattern = '(?:page/[\d]+/)?$';
+        // Determine full pattern
         if ( get_option($this->wpv_update_pagenavi_optname) == 1 ) {
-            // Purge all pages of the archive.
-            $archive_pattern = '(?:page/[\d]+/)?$';
+            // Purge all pages of the archive and its feed.
+            $archive_pattern = sprintf( '(%s|%s|$)', $archive_feed_pattern, $archive_page_pattern );
         } else {
-            // Only first page of the archive is purged.
-            $archive_pattern = '$';
+            // Only first page of the archive and its feed are purged.
+            $archive_pattern = $archive_feed_pattern;
         }
 
         // Front page (latest posts OR static front page)
         $this->WPVMPurgeObject( '/' . $archive_pattern );
+
+        // Feeds (ALREADY COVERED BY FRONT PAGE)
+        //$this->WPVMPurgeObject( '/feed/(?:(atom|rdf)/)?$' );
 
         // Static Posts page (Added only if a static page used as the 'posts page')
         if ( get_option('show_on_front', 'posts') == 'page' && intval(get_option('page_for_posts', 0)) > 0 ) {
             $posts_page_url = get_permalink(intval(get_option('page_for_posts')));
             $this->WPVMPurgeObject( $posts_page_url . $archive_pattern );
         }
-
-        // Feeds
-        $this->WPVMPurgeObject( '/feed/(?:(atom|rdf)/)?$' );
 
         // Category, Tag, Author and Date Archives
 
