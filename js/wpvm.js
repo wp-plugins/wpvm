@@ -16,19 +16,19 @@ function createVarnishServerRow(tableID, id, addr, port, secret) {
 	wpv_addr.className = "regular-text";
 	wpv_addr.type = "text";
 	wpv_addr.id = id;
-	wpv_addr.name = "wpvm_addr[]";
+	wpv_addr.name = "varnish_addresses[]";
 	wpv_addr.value = addr || "";
 
 	wpv_port.className = "small-text";
 	wpv_port.type = "text";
 	wpv_port.id = id;
-	wpv_port.name = "wpvm_port[]";
+	wpv_port.name = "varnish_ports[]";
 	wpv_port.value = port || "";
 
 	wpv_secret.className = "regular-text";
 	wpv_secret.type = "text";
 	wpv_secret.id = id;
-	wpv_secret.name = "wpvm_secret[]";
+	wpv_secret.name = "varnish_secrets[]";
 	wpv_secret.value = secret || "";
 
 	dRow.className = "";

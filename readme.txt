@@ -1,9 +1,9 @@
 === WPVM ===
-Contributors: gnotaras, pkhamre, wfelipe, eitch
+Contributors: gnotaras
 Tags: cache, caching, performance, varnish, purge, speed, invalidate, ban
 Requires at least: 3.1.0
-Tested up to: 3.8
-Stable tag: 1.0.4
+Tested up to: 4.2
+Stable tag: 2.0.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -11,18 +11,20 @@ WPVM (WordPress Varnish Modified) purges pages from Varnish caching servers eith
 
 == Description ==
 
-*WPVM* started as a fork of [WP-Varnish](https://github.com/pkhamre/wp-varnish)
-plugin v0.8, but now it is developed independently.
+*WPVM* is possibly the most advanced and most complete plugin you can find to purge your cached content of your WordPress powered web site from Varnish caches.
 
-The core of WP-Varnish that generates the URLs that need to be purged has been
-rewritten from scratch in order to be as complete as possible. Several other
-improvements have been implemented and bugs have been fixed. Many of my changes
-have been contributed upstream.
+*WPVM* version 1 started as a fork of [WP-Varnish](https://github.com/pkhamre/wp-varnish)
+plugin v0.8 in order to send patches upstream, but for various reasons it ended up being developed independently.
 
-Although this plugin is meant to 'just work', it should be considered **experimental**.
+*WPVM* version 2 is an almost complete rewrite of the original code.
 
-Feature requests are not accepted at this time, unless they are accompanied by
-a tested patch which adds a needed feature.
+= Translations = 
+
+Join the <a href="https://www.transifex.com/projects/p/wpvm/">WPVM translations project</a> for WPVM and start translating.
+
+= Development =
+
+Feature requests are not accepted at this time, unless they are accompanied by a tested patch which adds a needed feature.
 
 Development takes place at:
 
