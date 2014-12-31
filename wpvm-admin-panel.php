@@ -49,8 +49,7 @@ function wpvm_show_info_msg($msg) {
 /*
 * Construct the WPVM administration panel under Settings->Varnish
 */
-add_action( 'admin_init', 'wpvm_admin_init' );
-add_action( 'admin_menu', 'wpvm_admin_menu');
+
 
 
 function wpvm_admin_init() {
@@ -73,37 +72,34 @@ function wpvm_admin_init() {
     // wp_register_style( 'myPluginStylesheet', plugins_url('stylesheet.css', __FILE__) );
 
 }
+add_action( 'admin_init', 'wpvm_admin_init' );
 
 
 function wpvm_admin_menu() {
     /* Register our plugin page */
-    $page_hook_suffix = add_options_page(
+    add_options_page(
         __('Varnish Settings', 'wpvm'),
         __('Varnish', 'wpvm'),
         'manage_options',
         'wpvm-options',
         'wpvm_options_page'
     );
-
-    /*
-     * Use the retrieved $page_hook_suffix to hook the function that links our script.
-     * This hook invokes the function only on our plugin administration screen,
-     * see: http://codex.wordpress.org/Administration_Menus#Page_Hook_Suffix
-     */
-    add_action( 'admin_print_scripts-' . $page_hook_suffix, 'wpvm_admin_scripts');
-    /* Again use $page_hook_suffix to hook the function that links our stylesheet. */
-    add_action( 'admin_print_styles-' . $page_hook_suffix, 'wpvm_admin_styles' );
 }
+add_action( 'admin_menu', 'wpvm_admin_menu');
 
 
-function wpvm_admin_scripts() {
-    // Link our already registered script to a page
+/** Enqueue scripts and styles
+ *  From: http://codex.wordpress.org/Plugin_API/Action_Reference/admin_enqueue_scripts#Example:_Target_a_Specific_Admin_Page
+ */
+function wpvm_enqueue_admin_scripts_and_styles($hook) {
+    //var_dump($hook);
+    if ( 'settings_page_wpvm-options' != $hook ) {
+        return;
+    }
     wp_enqueue_script( 'wpvm-server-table' );
 }
-function wpvm_admin_styles() {
-    // It will be called only on your plugin admin page, enqueue our stylesheet here
-    //wp_enqueue_style( 'myPluginStylesheet' );
-}
+add_action( 'admin_enqueue_scripts', 'wpvm_enqueue_admin_scripts_and_styles' );
+// Note: `admin_print_styles` should not be used to enqueue styles or scripts on the admin pages. Use `admin_enqueue_scripts` instead.
 
 
 function wpvm_options_page() {
@@ -234,23 +230,6 @@ function wpvm_options_page() {
     wpvm_set_varnish_options($options);
 
 }
-
-
-/** Enqueue scripts and styles
- *  From: http://codex.wordpress.org/Plugin_API/Action_Reference/admin_enqueue_scripts#Example:_Target_a_Specific_Admin_Page
- *  For a better way to add custom scripts and styles:
- *  - http://codex.wordpress.org/Function_Reference/wp_enqueue_script#Link_Scripts_Only_on_a_Plugin_Administration_Screen
- *  - http://codex.wordpress.org/Function_Reference/wp_enqueue_style#Load_stylesheet_only_on_a_plugin.27s_options_page
- */
-function wpvm_my_enqueue($hook) {
-    //var_dump($hook);
-    if ( 'settings_page_wpvm-options' != $hook ) {
-        return;
-    }
-    wp_enqueue_script('thickbox');
-    wp_enqueue_style('thickbox');
-}
-//add_action( 'admin_enqueue_scripts', 'wpvm_my_enqueue' );
 
 
 function wpvm_set_varnish_options($options) {
