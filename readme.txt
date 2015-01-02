@@ -18,6 +18,8 @@ plugin v0.8 in order to send patches upstream, but for various reasons it ended 
 
 *WPVM* version 2 is an almost complete rewrite of the original code.
 
+*We are still in beta phase* - Please do not rate the plugin based on potential errors, but report them to the forum instead. Thanks in advance.
+
 = Translations = 
 
 Join the <a href="https://www.transifex.com/projects/p/wpvm/">WPVM translations project</a> for WPVM and start translating.
