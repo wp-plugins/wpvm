@@ -75,9 +75,9 @@ function wpvm_admin_init() {
     // Register scripts and styles
 
     /* Register our script. */
-    wp_register_script( 'wpvm-server-table', plugins_url('js/wpvm.js', __FILE__ ) );
+    wp_register_script( 'wpvm-server-table', plugins_url('js/wpvm.js', WPVM_PLUGIN_FILE ) );
     /* Register our stylesheet. */
-    // wp_register_style( 'myPluginStylesheet', plugins_url('stylesheet.css', __FILE__) );
+    // wp_register_style( 'myPluginStylesheet', plugins_url('stylesheet.css', WPVM_PLUGIN_FILE) );
 
 }
 add_action( 'admin_init', 'wpvm_admin_init' );

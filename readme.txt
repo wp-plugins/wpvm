@@ -2,8 +2,8 @@
 Contributors: gnotaras
 Tags: cache, caching, performance, varnish, purge, speed, invalidate, ban
 Requires at least: 3.1.0
-Tested up to: 4.2
-Stable tag: 2.0.2
+Tested up to: 4.3
+Stable tag: 2.0.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -17,6 +17,8 @@ WPVM (WordPress Varnish Modified) purges pages from Varnish caching servers eith
 plugin v0.8 in order to send patches upstream, but for various reasons it ended up being developed independently.
 
 *WPVM* version 2 is an almost complete rewrite of the original code.
+
+*We are still in beta phase* - Please do not rate the plugin based on potential errors, but report them to the forum instead. Thanks in advance.
 
 = Translations = 
 

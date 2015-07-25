@@ -3,7 +3,7 @@
 Plugin Name: WPVM
 Plugin URI: https://github.com/gnotaras/wordpress-varnish-modified
 Description: WPVM (WordPress Varnish Modified) purges pages from Varnish caching servers either automatically as content is updated or on demand.
-Version: 2.0.2
+Version: 2.0.3
 Author: George Notaras
 Author URI: http://www.g-loaded.eu/
 License: GPLv3
@@ -61,12 +61,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Store plugin directory
-define( 'WPVM_DIR', plugin_dir_path( __FILE__ ) );
+define( 'WPVM_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+// Store plugin main file path
+define( 'WPVM_PLUGIN_FILE', __FILE__ );
 
 // Import modules
-require_once( WPVM_DIR . 'wpvm-settings.php' );
-require_once( WPVM_DIR . 'wpvm-admin-panel.php' );
-require_once( WPVM_DIR . 'wpvm-utils.php' );
+require_once( WPVM_PLUGIN_DIR . 'wpvm-settings.php' );
+require_once( WPVM_PLUGIN_DIR . 'wpvm-admin-panel.php' );
+require_once( WPVM_PLUGIN_DIR . 'wpvm-utils.php' );
 
 
 /*
@@ -74,14 +76,14 @@ require_once( WPVM_DIR . 'wpvm-utils.php' );
  *
  * Translation files are searched in: wp-content/plugins
  */
-load_plugin_textdomain('wpvm', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/');
+load_plugin_textdomain('wpvm', false, dirname( plugin_basename( WPVM_PLUGIN_FILE ) ) . '/languages/');
 
 
 /**
  * Settings Link in the ``Installed Plugins`` page
  */
 function wpvm_plugin_actions( $links, $file ) {
-    if( $file == plugin_basename(__FILE__) && function_exists( "admin_url" ) ) {
+    if( $file == plugin_basename( WPVM_PLUGIN_FILE ) && function_exists( "admin_url" ) ) {
         $settings_link = '<a href="' . admin_url( 'options-general.php?page=wpvm-options' ) . '">' . __('Settings') . '</a>';
         // Add the settings link before other links
         array_unshift( $links, $settings_link );
@@ -157,7 +159,13 @@ function wpvm_purge_post_status($new, $old, $post) {
 
 
 // Purge a post object
-function wpvm_purge_post($post_id, $post, $purge_comments=false) {
+function wpvm_purge_post($post_id, $post=null, $purge_comments=false) {
+
+    if ( absint( $post_id ) <= 0 ) {
+        return;
+    } elseif ( $post === null ) {
+        $post = get_post( $post_id );
+    }
 
     // We need a post object, so we perform a few checks.
     // Supported posts, pages, attachment pages, custom post types.
