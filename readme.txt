@@ -56,4 +56,4 @@ No special requirements when upgrading.
 
 == Changelog ==
 
-No changelog is currently available.
+Please check out the changelog of each release by following the links below. You can also check the [roadmap](http://www.codetrax.org/projects/wpvm/roadmap "WPVM Roadmap") regarding future releases of the plugin.
